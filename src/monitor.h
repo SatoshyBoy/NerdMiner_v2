@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+//batter pin
+#define PIN_BAT_VOLT    4
+
 // Monitor states
 #define SCREEN_MINING   0
 #define SCREEN_CLOCK    1

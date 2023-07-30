@@ -216,6 +216,11 @@ void changeScreen(void){
     mMonitor.screen++;
     if(mMonitor.screen> SCREEN_GLOBAL) mMonitor.screen = SCREEN_MINING;
 }
+
+/*
+* @brief  Main scren after booting the device
+*
+*/
 void show_MinerScreen(unsigned long mElapsed){
 
     //Print background screen
@@ -279,9 +284,19 @@ void show_MinerScreen(unsigned long mElapsed){
     }
 
     //Print Hour
-    render.setFontSize(20);
-    render.rdrawString(getTime().c_str(), 286, 1, TFT_BLACK);
+    // render.setFontSize(20);
+    // render.rdrawString(getTime().c_str(), 286, 1, TFT_BLACK);
 
+      //Print battery levels
+    float volt = (analogRead(PIN_BAT_VOLT) * 2 * 3.3) / 4096;
+    sprintf(temp_str, "%.2f", volt);
+    render.setFontSize(20);
+    render.rdrawString(temp_str, 286, 1, TFT_BLACK);
+    // background.setFreeFont(FSSB9);
+    // background.setTextSize(1);
+    // background.setTextDatum(TR_DATUM);
+    // background.setTextColor(TFT_BLACK);
+    // background.drawString(temp_str, 286, 1, GFXFF);
     //Push prepared background to screen
     background.pushSprite(0,0);
 }
@@ -296,9 +311,7 @@ void show_ClockScreen(unsigned long mElapsed){
     sprintf(CurrentHashrate, "%.2f", (1.0*(elapsedKHs*1000))/mElapsed);
 
     //Serial.println("[runMonitor Task] -> Printing results on screen ");
-    
-     Serial.printf(">>> Completed %d share(s), %d Khashes, avg. hashrate %s KH/s\n",
-      shares, totalKHashes, CurrentHashrate);
+    // Serial.printf(">>> Completed %d share(s), %d Khashes, avg. hashrate %s KH/s\n", shares, totalKHashes, CurrentHashrate);
 
     //Hashrate
     render.setFontSize(50);
