@@ -11,6 +11,7 @@
 #include "mining.h"
 #include "utils.h"
 #include "monitor.h"
+#include "rtc_tempsensor.h"
 
 extern char poolString[80];
 extern unsigned long templates;
@@ -218,6 +219,11 @@ void changeScreen(void){
     mMonitor.screen++;
     if(mMonitor.screen> SCREEN_GLOBAL) mMonitor.screen = SCREEN_MINING;
 }
+
+/*
+* @brief  Main scren after booting the device
+*
+*/
 void show_MinerScreen(unsigned long mElapsed){
 
     //Print background screen
@@ -266,23 +272,33 @@ void show_MinerScreen(unsigned long mElapsed){
     render.drawString(String(valids).c_str(), 285, 56, 0xDEDB);
 
     //Print Temp
-    String temp = String(temperatureRead(), 0);
-    render.setFontSize(20);
-    render.rdrawString(String(temp).c_str(), 239, 1, TFT_BLACK);
-
-    render.setFontSize(7);
-    render.rdrawString(String(0).c_str(), 244, 3, TFT_BLACK);
+    static char temp_str[10];
+    float temp;
+    if (temperatureRead_fix(&temp) == ESP_OK)
+    {
+      sprintf(temp_str, "%.0f", temp);
+      //Print Temperature
+      render.setFontSize(20);
+      render.rdrawString(temp_str, 236, 1, TFT_BLACK);
+      //print the degree simbol
+      render.setFontSize(7);
+      render.rdrawString(String(0).c_str(), 241, 3, TFT_BLACK);
+    }
 
     //Print Hour
+    // render.setFontSize(20);
+    // render.rdrawString(getTime().c_str(), 286, 1, TFT_BLACK);
+
+      //Print battery levels
+    float volt = (analogRead(PIN_BAT_VOLT) * 2 * 3.3) / 4096;
+    sprintf(temp_str, "%.2f", volt);
     render.setFontSize(20);
-    render.rdrawString(getTime().c_str(), 286, 1, TFT_BLACK);
-
-    // pool url
-    /*background.setTextSize(1);
-    background.setTextDatum(MC_DATUM);
-    background.setTextColor(0xDEDB);
-    background.drawString(String(poolString), 59, 85, FONT2);*/
-
+    render.rdrawString(temp_str, 286, 1, TFT_BLACK);
+    // background.setFreeFont(FSSB9);
+    // background.setTextSize(1);
+    // background.setTextDatum(TR_DATUM);
+    // background.setTextColor(TFT_BLACK);
+    // background.drawString(temp_str, 286, 1, GFXFF);
     //Push prepared background to screen
     background.pushSprite(0,0);
 }
@@ -297,9 +313,7 @@ void show_ClockScreen(unsigned long mElapsed){
     sprintf(CurrentHashrate, "%.2f", (1.0*(elapsedKHs*1000))/mElapsed);
 
     //Serial.println("[runMonitor Task] -> Printing results on screen ");
-    
-     Serial.printf(">>> Completed %d share(s), %d Khashes, avg. hashrate %s KH/s\n",
-      shares, totalKHashes, CurrentHashrate);
+    // Serial.printf(">>> Completed %d share(s), %d Khashes, avg. hashrate %s KH/s\n", shares, totalKHashes, CurrentHashrate);
 
     //Hashrate
     render.setFontSize(50);
